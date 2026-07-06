@@ -110,10 +110,10 @@
 
     input, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px 10px; /* Mejor área táctil para móvil */
       border: 1px solid var(--line);
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 16px; /* 16px evita el zoom automático al escribir en iOS */
       transition: all 0.2s;
     }
 
@@ -205,10 +205,7 @@
       border: none;
       border-radius: 6px;
       transition: opacity 0.2s;
-    }
-
-    button:hover {
-      opacity: 0.9;
+      min-height: 44px; /* Tamaño mínimo recomendado para pantallas táctiles */
     }
 
     .ghost-button {
@@ -396,10 +393,58 @@
       padding-top: 10px;
     }
 
+    /* --- INICIO DE OPTIMIZACIÓN PARA MÓVILES --- */
     @media (max-width: 768px) {
-      .filter-row { grid-template-columns: 1fr; }
-      .budget-grid { max-width: 100%; }
-      .section-heading { flex-direction: column; gap: 10px; }
+      .app-shell {
+        padding: 16px 12px;
+      }
+      .top-panel {
+        padding: 16px;
+        gap: 15px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .budget-grid {
+        max-width: 100%;
+        grid-template-columns: 1fr 1fr; /* Presupuestos uno al lado del otro */
+      }
+      .summary-grid {
+        grid-template-columns: 1fr 1fr; /* Tarjetas de resumen en 2x2 */
+        gap: 10px;
+      }
+      .summary-card {
+        padding: 15px 12px;
+      }
+      .summary-card strong {
+        font-size: 1.8rem;
+      }
+      .summary-card small {
+        font-size: 0.75rem;
+        line-height: 1.2;
+      }
+      .meals-grid {
+        grid-template-columns: 1fr; /* Comidas apiladas verticalmente */
+        gap: 15px;
+      }
+      .filter-row { 
+        grid-template-columns: 1fr; 
+      }
+      .section-heading { 
+        flex-direction: column; 
+        gap: 10px; 
+      }
+      .ideas-grid {
+        grid-template-columns: 1fr; /* Sugerencias en 1 sola columna */
+      }
+      .progress-meta {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+      }
+      #resetDay {
+        width: 100%; /* Botón de limpiar día a lo ancho completo */
+      }
     }
   </style>
 </head>
