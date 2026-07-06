@@ -775,7 +775,6 @@
       ];
 
       const mealOrder = ["breakfast", "lunch", "dinner"];
-      
       const state = loadState();
 
       const budgetInput = document.querySelector("#dailyBudget");
@@ -788,7 +787,6 @@
 
       function loadState() {
         try {
-          // Usando localStorage del navegador (esto actúa como nuestro JSON local guardado)
           const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
           return {
             ...defaultState,
