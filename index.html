@@ -2,19 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <!-- Configuración estricta de viewport para evitar zoom en iOS y comportarse como app nativa -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Plan Diario de Comidas</title>
   
-  <!-- Carga de fuente Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Carga de Tailwind CSS para diseño adaptable y móvil -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Configuración de colores personalizados en Tailwind -->
   <script>
     tailwind.config = {
       theme: {
@@ -37,24 +33,17 @@
   </script>
 
   <style>
-    /* Ajustes extra para comportamiento táctil y estética de App */
     body {
       background-color: #f6f3ed;
       -webkit-tap-highlight-color: transparent;
     }
-    
-    /* Ocultar barra de scroll para limpieza visual */
     ::-webkit-scrollbar {
       width: 0px;
       background: transparent;
     }
-
-    /* Forzar tamaño de fuente en inputs para evitar zoom en iPhone */
     input[type="number"], input[type="search"], textarea {
       font-size: 16px !important; 
     }
-    
-    /* Ocultar flechas de los inputs numéricos */
     input[type="number"]::-webkit-inner-spin-button, 
     input[type="number"]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
@@ -63,13 +52,11 @@
     input[type="number"] {
       -moz-appearance: textfield;
     }
-
     .transition-all { transition: all 0.3s ease; }
   </style>
 </head>
 <body class="text-slate-800 antialiased pb-20">
 
-  <!-- Contenedor principal estilo App (máximo ancho de móvil/tablet) -->
   <main class="max-w-md mx-auto bg-app-bg min-h-screen shadow-2xl relative">
     
     <header class="bg-app-panel px-5 py-6 rounded-b-3xl shadow-sm z-10 relative">
@@ -119,7 +106,6 @@
 
     <section class="px-5 mt-6">
       <div class="bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100">
-        <!-- Calorías -->
         <div class="mb-4">
           <div class="flex justify-between text-xs font-bold mb-2">
             <span class="text-slate-500">Progreso Calorías</span>
@@ -129,7 +115,6 @@
             <div id="progressBar" class="h-full bg-gradient-to-r from-app-sage to-app-gold transition-all duration-500" style="width: 0%"></div>
           </div>
         </div>
-        <!-- Proteína -->
         <div class="mb-4">
           <div class="flex justify-between text-xs font-bold mb-2">
             <span class="text-slate-500">Progreso Proteína</span>
@@ -141,7 +126,8 @@
         </div>
         
         <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-          <span id="closedMealsText" class="text-sm font-bold text-slate-500">0 comidas listas</span>
+          <button id="undoBtn" class="text-slate-400 text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 active:bg-slate-100 transition-colors hidden">Deshacer</button>
+          <span id="closedMealsText" class="text-sm font-bold text-slate-500 ml-auto mr-4">0 comidas</span>
           <button id="resetDay" class="text-app-tomato text-sm font-bold px-4 py-2 rounded-lg border border-app-tomato/30 bg-red-50 active:bg-red-100 transition-colors">Limpiar día</button>
         </div>
       </div>
@@ -159,21 +145,23 @@
           <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-breakfast">Abierta</span>
         </div>
         
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-            <input type="number" id="cal-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-          </label>
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-            <input type="number" id="pro-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+        <div id="content-breakfast" class="transition-all duration-300 overflow-hidden">
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
+              <input type="number" id="cal-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
+              <input type="number" id="pro-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+          </div>
+          <label class="flex flex-col mb-4">
+            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
+            <textarea id="desc-breakfast" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Tostadas con aguacate..."></textarea>
           </label>
         </div>
-        <label class="flex flex-col mb-4">
-          <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-          <textarea id="desc-breakfast" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Tostadas con aguacate..."></textarea>
-        </label>
-        <button id="btn-breakfast" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform">Cerrar comida</button>
+        <button id="btn-breakfast" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
       </article>
 
       <!-- ALMUERZO -->
@@ -186,21 +174,23 @@
           <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-lunch">Abierta</span>
         </div>
         
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-            <input type="number" id="cal-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-          </label>
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-            <input type="number" id="pro-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+        <div id="content-lunch" class="transition-all duration-300 overflow-hidden">
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
+              <input type="number" id="cal-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
+              <input type="number" id="pro-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+          </div>
+          <label class="flex flex-col mb-4">
+            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
+            <textarea id="desc-lunch" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Pechuga con arroz..."></textarea>
           </label>
         </div>
-        <label class="flex flex-col mb-4">
-          <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-          <textarea id="desc-lunch" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Pechuga con arroz..."></textarea>
-        </label>
-        <button id="btn-lunch" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform">Cerrar comida</button>
+        <button id="btn-lunch" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
       </article>
 
       <!-- CENA -->
@@ -213,21 +203,23 @@
           <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-dinner">Abierta</span>
         </div>
         
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-            <input type="number" id="cal-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-          </label>
-          <label class="flex flex-col">
-            <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-            <input type="number" id="pro-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+        <div id="content-dinner" class="transition-all duration-300 overflow-hidden">
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
+              <input type="number" id="cal-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+            <label class="flex flex-col">
+              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
+              <input type="number" id="pro-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
+            </label>
+          </div>
+          <label class="flex flex-col mb-4">
+            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
+            <textarea id="desc-dinner" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Ensalada de atún..."></textarea>
           </label>
         </div>
-        <label class="flex flex-col mb-4">
-          <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-          <textarea id="desc-dinner" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Ensalada de atún..."></textarea>
-        </label>
-        <button id="btn-dinner" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform">Cerrar comida</button>
+        <button id="btn-dinner" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
       </article>
 
     </section>
@@ -246,12 +238,26 @@
           </label>
         </div>
 
-        <!-- Contenedor donde se insertan las ideas con JS -->
         <div id="ideasGrid" class="flex flex-col gap-3">
           <!-- Renderizado dinámico -->
         </div>
       </div>
     </section>
+
+    <!-- MODAL INELUDIBLE ROJO -->
+    <div id="overbudget-modal" class="fixed inset-0 bg-red-600 z-50 hidden flex-col items-center justify-center p-4 transition-opacity">
+      <div class="absolute inset-0 bg-red-700 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div id="overbudget-content" class="p-8 max-w-sm w-full transform scale-95 transition-transform text-center relative z-10">
+        <h2 class="text-4xl font-black text-white mb-4">¡Límite superado!</h2>
+        <p id="overbudget-message" class="text-red-100 font-medium mb-10 text-xl leading-tight"></p>
+        <div class="flex flex-col gap-4">
+          <!-- Botón de deshacer en el modal -->
+          <button id="modal-undo" class="w-full py-4 rounded-xl bg-red-500/50 border border-red-400 text-white font-bold text-lg active:scale-95 transition-transform shadow-sm">Deshacer última acción</button>
+          <!-- Botón de reiniciar -->
+          <button id="modal-reset" class="w-full py-4 rounded-xl bg-white text-red-700 font-extrabold text-lg active:scale-95 transition-transform shadow-lg">Reiniciar día</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -268,6 +274,8 @@
         }
       };
 
+      let historyStack = [];
+
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) state = JSON.parse(saved);
@@ -276,10 +284,13 @@
       }
 
       function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.warn("No se pudo guardar", e);
+        }
       }
 
-      // Base de datos de ideas
       const mealIdeas = [
         { name: "Tortilla francesa con pan integral", calories: 360, protein: 24, prep: "Huevos, pan integral y tomate." },
         { name: "Bowl de yogur griego con avena", calories: 420, protein: 32, prep: "Yogur griego, avena, frutos rojos." },
@@ -306,8 +317,47 @@
         panelS: document.getElementById('suggestionsPanel'),
         maxC: document.getElementById('maxCalories'),
         search: document.getElementById('searchIdeas'),
-        grid: document.getElementById('ideasGrid')
+        grid: document.getElementById('ideasGrid'),
+        modal: document.getElementById('overbudget-modal'),
+        modalMsg: document.getElementById('overbudget-message'),
+        undoBtn: document.getElementById('undoBtn'),
+        modalUndo: document.getElementById('modal-undo'),
+        modalReset: document.getElementById('modal-reset')
       };
+
+      function pushHistory() {
+        historyStack.push(JSON.parse(JSON.stringify(state)));
+        if (historyStack.length > 20) historyStack.shift();
+        dom.undoBtn.classList.remove('hidden');
+      }
+
+      function performUndo() {
+        if (historyStack.length > 0) {
+          state = historyStack.pop();
+          saveState();
+          updateUI();
+          if (historyStack.length === 0) dom.undoBtn.classList.add('hidden');
+        }
+      }
+
+      dom.undoBtn.addEventListener('click', performUndo);
+      dom.modalUndo.addEventListener('click', performUndo);
+      
+      dom.modalReset.addEventListener('click', () => {
+        pushHistory();
+        state.meals = {
+          breakfast: { calories: "", protein: "", description: "", closed: false },
+          lunch: { calories: "", protein: "", description: "", closed: false },
+          dinner: { calories: "", protein: "", description: "", closed: false }
+        };
+        ['breakfast', 'lunch', 'dinner'].forEach(m => {
+          document.getElementById('cal-' + m).value = "";
+          document.getElementById('pro-' + m).value = "";
+          document.getElementById('desc-' + m).value = "";
+        });
+        saveState();
+        updateUI();
+      });
 
       function updateUI() {
         let totals = { cal: 0, pro: 0, closed: 0 };
@@ -331,38 +381,67 @@
         let percCal = bgCal > 0 ? Math.min(100, (totals.cal / bgCal) * 100) : 0;
         let percPro = bgPro > 0 ? Math.min(100, (totals.pro / bgPro) * 100) : 0;
         
+        if (totals.cal > bgCal) {
+           dom.pBar.className = "h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500";
+           dom.txtC.classList.replace('text-app-sage', 'text-red-500');
+        } else {
+           dom.pBar.className = "h-full bg-gradient-to-r from-app-sage to-app-gold transition-all duration-500";
+           dom.txtC.classList.replace('text-red-500', 'text-app-sage');
+        }
+
         dom.pBar.style.width = percCal + "%";
         dom.pPro.style.width = percPro + "%";
         dom.txtC.textContent = Math.round(percCal) + "%";
         dom.txtP.textContent = Math.round(percPro) + "%";
         dom.txtM.textContent = totals.closed + " comidas listas";
 
-        // Actualizar visual de las tarjetas
+        const diff = totals.cal - bgCal;
+        if (diff > 0 && totals.closed > 0) {
+          if (diff > 500) {
+             dom.modalMsg.innerHTML = `Has superado tu meta por <span class="font-black text-3xl">${diff}</span> kcal.<br><br>Día de ayuno hasta mañana.<br><span class="bg-red-900/50 px-3 py-2 rounded-xl inline-block mt-4 text-white">Mañana toca hacer OMAD.</span>`;
+          } else {
+             dom.modalMsg.innerHTML = `Has superado tu meta por <span class="font-black text-3xl">${diff}</span> kcal.<br><br>Día de ayuno hasta mañana.`;
+          }
+          dom.modal.classList.remove('hidden');
+          dom.modal.classList.add('flex');
+          document.body.classList.add('overflow-hidden');
+        } else {
+          dom.modal.classList.add('hidden');
+          dom.modal.classList.remove('flex');
+          document.body.classList.remove('overflow-hidden');
+        }
+
         ['breakfast', 'lunch', 'dinner'].forEach(meal => {
           const isClosed = state.meals[meal].closed;
           const card = document.getElementById('card-' + meal);
           const btn = document.getElementById('btn-' + meal);
           const lbl = document.getElementById('state-' + meal);
+          const content = document.getElementById('content-' + meal);
           
           ['cal', 'pro', 'desc'].forEach(p => document.getElementById(`${p}-${meal}`).disabled = isClosed);
           
           if (isClosed) {
-            card.className = "bg-green-50 rounded-2xl p-5 shadow-sm border border-green-200 transition-all duration-300";
-            btn.className = "w-full py-3 rounded-xl bg-white text-app-sagedeep border border-green-300 font-bold text-sm active:scale-95 transition-transform";
+            card.className = "bg-green-50 rounded-2xl p-4 shadow-sm border border-green-200 transition-all duration-300";
+            btn.className = "w-full py-2.5 rounded-xl bg-white text-app-sagedeep border border-green-300 font-bold text-sm active:scale-95 transition-transform mt-0";
             btn.textContent = "Abrir para editar";
             lbl.className = "text-xs font-bold px-3 py-1 rounded-full bg-green-200 text-green-800";
             lbl.textContent = "Completada";
+            content.style.maxHeight = "0px";
+            content.style.opacity = "0";
+            content.style.marginBottom = "0px";
           } else {
             card.className = "bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300";
-            btn.className = "w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform";
+            btn.className = "w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2";
             btn.textContent = "Cerrar comida";
             lbl.className = "text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500";
             lbl.textContent = "Abierta";
+            content.style.maxHeight = "300px";
+            content.style.opacity = "1";
+            content.style.marginBottom = "12px";
           }
         });
 
-        // Sugerencias
-        if (totals.closed >= 2) {
+        if (totals.closed >= 2 && totals.cal <= bgCal) {
           dom.panelS.classList.remove('hidden');
           if (document.activeElement !== dom.maxC) dom.maxC.value = leftCal;
           renderIdeas(leftCal);
@@ -397,7 +476,6 @@
         `).join('');
       }
 
-      // Inicializar Inputs
       dom.bCal.value = state.dailyBudget;
       dom.bPro.value = state.proteinBudget;
       dom.bCal.addEventListener('input', e => { state.dailyBudget = e.target.value; saveState(); updateUI(); });
@@ -405,7 +483,6 @@
       dom.search.addEventListener('input', () => updateUI());
       dom.maxC.addEventListener('input', () => updateUI());
 
-      // Listeners de Comidas
       ['breakfast', 'lunch', 'dinner'].forEach(meal => {
         ['cal', 'pro', 'desc'].forEach(p => {
           const el = document.getElementById(`${p}-${meal}`);
@@ -419,18 +496,18 @@
           });
         });
 
-        // Botón cerrar sin usar alert()
         document.getElementById('btn-' + meal).addEventListener('click', (e) => {
           const m = state.meals[meal];
           const btn = e.target;
           
           if (m.closed) {
+            pushHistory();
             m.closed = false;
           } else {
             if (Number(m.calories) > 0 && Number(m.protein) > 0) {
+              pushHistory();
               m.closed = true;
             } else {
-              // Animación de error visual en lugar de alert()
               const originalText = btn.textContent;
               btn.textContent = "Faltan datos (Kcal / Prot)";
               btn.classList.add('bg-app-tomato');
@@ -448,7 +525,6 @@
         });
       });
 
-      // Botón Limpiar sin usar confirm()
       let resetClicks = 0;
       const resetBtn = document.getElementById('resetDay');
       resetBtn.addEventListener('click', () => {
@@ -462,7 +538,7 @@
             resetBtn.className = "text-app-tomato text-sm font-bold px-4 py-2 rounded-lg border border-app-tomato/30 bg-red-50 transition-colors";
           }, 3000);
         } else {
-          // Confirmado
+          pushHistory();
           state.meals = {
             breakfast: { calories: "", protein: "", description: "", closed: false },
             lunch: { calories: "", protein: "", description: "", closed: false },
