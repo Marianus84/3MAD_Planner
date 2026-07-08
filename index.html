@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Plan Diario de Comidas</title>
+  <title>Recetas por Calorías</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -41,527 +41,323 @@
       width: 0px;
       background: transparent;
     }
-    input[type="number"], input[type="search"], textarea {
-      font-size: 16px !important; 
+    input[type="number"] {
+      font-size: 24px !important; 
+      -moz-appearance: textfield;
     }
     input[type="number"]::-webkit-inner-spin-button, 
     input[type="number"]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
       margin: 0; 
     }
-    input[type="number"] {
-      -moz-appearance: textfield;
+    
+    /* Animación de carga */
+    .loader {
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #43695a;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
     }
-    .transition-all { transition: all 0.3s ease; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body class="text-slate-800 antialiased pb-20">
 
-  <main class="max-w-md mx-auto bg-app-bg min-h-screen shadow-2xl relative">
+  <main class="max-w-md mx-auto bg-app-bg min-h-screen shadow-2xl relative flex flex-col">
     
-    <header class="bg-app-panel px-5 py-6 rounded-b-3xl shadow-sm z-10 relative">
-      <p class="text-app-tomato text-xs font-bold uppercase tracking-wider mb-1">Registro Diario</p>
-      <h1 class="text-3xl font-extrabold text-app-sagedeep leading-tight mb-6">Mis Comidas</h1>
-      
-      <div class="grid grid-cols-2 gap-4">
-        <label class="flex flex-col">
-          <span class="text-xs font-bold text-slate-500 mb-1">Meta Calorías</span>
-          <div class="relative">
-            <input id="dailyBudget" type="number" class="w-full bg-slate-100 rounded-xl py-3 px-4 text-lg font-bold text-slate-700 outline-none focus:ring-2 focus:ring-app-sage" value="2000" />
-            <span class="absolute right-4 top-3 text-sm text-slate-400 font-bold">kcal</span>
-          </div>
-        </label>
-        <label class="flex flex-col">
-          <span class="text-xs font-bold text-slate-500 mb-1">Meta Proteína</span>
-          <div class="relative">
-            <input id="proteinBudget" type="number" class="w-full bg-slate-100 rounded-xl py-3 px-4 text-lg font-bold text-slate-700 outline-none focus:ring-2 focus:ring-app-sage" value="150" />
-            <span class="absolute right-4 top-3 text-sm text-slate-400 font-bold">g</span>
-          </div>
-        </label>
+    <!-- Encabezado -->
+    <header class="bg-app-panel px-6 py-8 rounded-b-3xl shadow-sm z-10 relative text-center">
+      <div class="w-16 h-16 bg-green-50 rounded-2xl mx-auto flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-app-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
       </div>
+      <h1 class="text-3xl font-extrabold text-app-sagedeep leading-tight mb-2">Chef Inteligente</h1>
+      <p class="text-slate-500 text-sm font-medium">Dime cuántas calorías tienes disponibles y te crearé la receta perfecta.</p>
     </header>
 
-    <section class="px-5 mt-6">
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-app-panel rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500">Consumidas</span>
-          <strong id="caloriesUsed" class="text-3xl font-extrabold text-app-sagedeep mt-2">0</strong>
-          <span class="text-xs text-slate-400 font-semibold mt-1">kcal registradas</span>
-        </div>
-        <div class="bg-app-panel rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500">Pendientes</span>
-          <strong id="caloriesLeft" class="text-3xl font-extrabold text-app-gold mt-2">2000</strong>
-          <span class="text-xs text-slate-400 font-semibold mt-1">kcal libres</span>
-        </div>
-        <div class="bg-app-panel rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500">Proteína total</span>
-          <strong id="proteinTotal" class="text-2xl font-extrabold text-app-blue mt-2">0 g</strong>
-        </div>
-        <div class="bg-app-panel rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500">Falta proteína</span>
-          <strong id="proteinLeft" class="text-2xl font-extrabold text-slate-700 mt-2">150 g</strong>
-        </div>
-      </div>
-    </section>
-
-    <section class="px-5 mt-6">
-      <div class="bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="mb-4">
-          <div class="flex justify-between text-xs font-bold mb-2">
-            <span class="text-slate-500">Progreso Calorías</span>
-            <span id="progressText" class="text-app-sage">0%</span>
-          </div>
-          <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div id="progressBar" class="h-full bg-gradient-to-r from-app-sage to-app-gold transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
-        <div class="mb-4">
-          <div class="flex justify-between text-xs font-bold mb-2">
-            <span class="text-slate-500">Progreso Proteína</span>
-            <span id="proteinProgressText" class="text-app-blue">0%</span>
-          </div>
-          <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div id="proteinProgressBar" class="h-full bg-gradient-to-r from-blue-300 to-app-blue transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
+    <!-- Controles -->
+    <section class="px-5 mt-8">
+      <div class="bg-app-panel rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center gap-5">
         
-        <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-          <button id="undoBtn" class="text-slate-400 text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 active:bg-slate-100 transition-colors hidden">Deshacer</button>
-          <span id="closedMealsText" class="text-sm font-bold text-slate-500 ml-auto mr-4">0 comidas</span>
-          <button id="resetDay" class="text-app-tomato text-sm font-bold px-4 py-2 rounded-lg border border-app-tomato/30 bg-red-50 active:bg-red-100 transition-colors">Limpiar día</button>
+        <!-- Selector Dulce/Salado -->
+        <div class="w-full flex bg-slate-100 rounded-xl p-1">
+          <label class="flex-1 text-center cursor-pointer relative">
+            <input type="radio" name="flavor" value="salada" class="peer sr-only" checked />
+            <div class="py-2.5 rounded-lg peer-checked:bg-white peer-checked:shadow-sm peer-checked:text-app-sagedeep font-bold text-slate-400 text-sm transition-all flex items-center justify-center gap-2">
+              <span>🧂 Salado</span>
+            </div>
+          </label>
+          <label class="flex-1 text-center cursor-pointer relative">
+            <input type="radio" name="flavor" value="dulce" class="peer sr-only" />
+            <div class="py-2.5 rounded-lg peer-checked:bg-white peer-checked:shadow-sm peer-checked:text-app-tomato font-bold text-slate-400 text-sm transition-all flex items-center justify-center gap-2">
+              <span>🍰 Dulce</span>
+            </div>
+          </label>
         </div>
-      </div>
-    </section>
 
-    <section class="px-5 mt-6 flex flex-col gap-5">
+        <label class="w-full text-center">
+          <span class="text-sm font-bold text-slate-400 uppercase tracking-widest block mb-3">Tus Calorías</span>
+          <div class="relative flex items-center justify-center max-w-[200px] mx-auto">
+            <input id="caloriesInput" type="number" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-4 text-center font-black text-slate-700 outline-none focus:border-app-sage focus:bg-white transition-colors" placeholder="Ej: 450" />
+            <span class="absolute right-4 text-slate-400 font-bold">kcal</span>
+          </div>
+        </label>
+        
+        <button id="generateBtn" class="w-full py-4 rounded-2xl bg-app-sagedeep text-white font-extrabold text-lg active:scale-95 transition-transform shadow-md hover:bg-app-sage flex justify-center items-center gap-2">
+          <span>Generar Receta</span>
+          <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+        </button>
+      </div>
       
-      <!-- DESAYUNO -->
-      <article class="bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300" id="card-breakfast">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-green-100 text-app-sagedeep flex items-center justify-center font-bold text-sm">01</span>
-            <h2 class="font-extrabold text-lg">Desayuno</h2>
-          </div>
-          <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-breakfast">Abierta</span>
-        </div>
-        
-        <div id="content-breakfast" class="transition-all duration-300 overflow-hidden">
-          <div class="grid grid-cols-2 gap-3 mb-3">
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-              <input type="number" id="cal-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-              <input type="number" id="pro-breakfast" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-          </div>
-          <label class="flex flex-col mb-4">
-            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-            <textarea id="desc-breakfast" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Tostadas con aguacate..."></textarea>
-          </label>
-        </div>
-        <button id="btn-breakfast" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
-      </article>
-
-      <!-- ALMUERZO -->
-      <article class="bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300" id="card-lunch">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-green-100 text-app-sagedeep flex items-center justify-center font-bold text-sm">02</span>
-            <h2 class="font-extrabold text-lg">Almuerzo</h2>
-          </div>
-          <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-lunch">Abierta</span>
-        </div>
-        
-        <div id="content-lunch" class="transition-all duration-300 overflow-hidden">
-          <div class="grid grid-cols-2 gap-3 mb-3">
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-              <input type="number" id="cal-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-              <input type="number" id="pro-lunch" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-          </div>
-          <label class="flex flex-col mb-4">
-            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-            <textarea id="desc-lunch" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Pechuga con arroz..."></textarea>
-          </label>
-        </div>
-        <button id="btn-lunch" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
-      </article>
-
-      <!-- CENA -->
-      <article class="bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300" id="card-dinner">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-green-100 text-app-sagedeep flex items-center justify-center font-bold text-sm">03</span>
-            <h2 class="font-extrabold text-lg">Cena</h2>
-          </div>
-          <span class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500" id="state-dinner">Abierta</span>
-        </div>
-        
-        <div id="content-dinner" class="transition-all duration-300 overflow-hidden">
-          <div class="grid grid-cols-2 gap-3 mb-3">
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Calorías</span>
-              <input type="number" id="cal-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-            <label class="flex flex-col">
-              <span class="text-xs font-bold text-slate-500 mb-1">Proteína (g)</span>
-              <input type="number" id="pro-dinner" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-3 font-semibold text-slate-700 outline-none focus:border-app-sage" placeholder="0" />
-            </label>
-          </div>
-          <label class="flex flex-col mb-4">
-            <span class="text-xs font-bold text-slate-500 mb-1">¿Qué comiste?</span>
-            <textarea id="desc-dinner" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-sm text-slate-700 outline-none focus:border-app-sage" placeholder="Ej: Ensalada de atún..."></textarea>
-          </label>
-        </div>
-        <button id="btn-dinner" class="w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2">Cerrar comida</button>
-      </article>
-
+      <!-- Mensaje de error (oculto por defecto) -->
+      <div id="errorMsg" class="hidden mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-semibold text-center">
+        Por favor, ingresa un número de calorías válido (ej. entre 100 y 3000).
+      </div>
     </section>
 
-    <section id="suggestionsPanel" class="px-5 mt-8 mb-8 hidden">
-      <div class="bg-app-sagedeep rounded-2xl p-5 shadow-lg text-white">
-        <p class="text-green-300 text-xs font-bold uppercase tracking-wider mb-1">Falta 1 comida</p>
-        <h2 class="text-xl font-extrabold mb-4">Ideas para completar tu día</h2>
+    <!-- Estado de Carga -->
+    <section id="loadingState" class="px-5 mt-10 hidden flex-col items-center justify-center gap-4 opacity-0 transition-opacity duration-300">
+      <div class="loader"></div>
+      <p class="text-app-sage font-bold animate-pulse text-center">Consultando al Chef...<br><span class="text-xs font-normal text-slate-500">Creando receta a medida</span></p>
+    </section>
+
+    <!-- Resultados de la Receta -->
+    <section id="recipeResult" class="px-5 mt-8 mb-10 hidden opacity-0 transition-opacity duration-500 translate-y-4">
+      
+      <div class="bg-app-panel rounded-3xl p-6 shadow-lg border border-slate-100 relative overflow-hidden">
+        <!-- Decoración de fondo -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-app-sage/5 rounded-full -mr-10 -mt-10 blur-xl"></div>
         
-        <div class="flex flex-col gap-3 mb-5">
-          <input id="searchIdeas" type="search" class="w-full bg-white/10 border border-white/20 text-white placeholder-green-100/50 rounded-xl py-3 px-4 outline-none focus:border-green-400" placeholder="Buscar ingrediente (ej. pollo)" />
+        <div class="relative z-10">
+          <div class="flex items-start justify-between gap-4 mb-2">
+            <h2 id="recipeTitle" class="text-2xl font-extrabold text-slate-800 leading-tight">Cargando...</h2>
+            <div class="bg-app-gold text-white text-xs font-black px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0 shadow-sm">
+              <span id="recipeKcal">0</span> kcal
+            </div>
+          </div>
           
-          <label class="flex items-center justify-between bg-white/5 rounded-xl px-4 py-2 border border-white/10">
-            <span class="text-sm font-semibold">Max kcal:</span>
-            <input id="maxCalories" type="number" class="w-20 bg-transparent text-right font-bold outline-none text-white" />
-          </label>
-        </div>
+          <p id="recipeDesc" class="text-slate-500 text-sm font-medium mb-6 italic">Descripción...</p>
+          
+          <div class="mb-6">
+            <h3 class="text-sm font-bold text-app-sagedeep uppercase tracking-widest mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              Ingredientes
+            </h3>
+            <ul id="ingredientsList" class="flex flex-col gap-2">
+              <!-- Renderizado dinámico -->
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-bold text-app-sagedeep uppercase tracking-widest mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Instrucciones
+            </h3>
+            <ol id="instructionsList" class="flex flex-col gap-4">
+              <!-- Renderizado dinámico -->
+            </ol>
+          </div>
+          
+          <!-- Botón Siguiente Opción -->
+          <button id="nextBtn" class="w-full mt-8 py-4 rounded-xl border-2 border-app-sage text-app-sagedeep font-extrabold text-sm hover:bg-green-50 active:scale-95 transition-all flex justify-center items-center gap-2">
+            <span>Esta no me gusta, siguiente opción</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+          </button>
 
-        <div id="ideasGrid" class="flex flex-col gap-3">
-          <!-- Renderizado dinámico -->
         </div>
       </div>
     </section>
 
-    <!-- MODAL INELUDIBLE ROJO -->
-    <div id="overbudget-modal" class="fixed inset-0 bg-red-600 z-50 hidden flex-col items-center justify-center p-4 transition-opacity">
-      <div class="absolute inset-0 bg-red-700 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-      <div id="overbudget-content" class="p-8 max-w-sm w-full transform scale-95 transition-transform text-center relative z-10">
-        <h2 class="text-4xl font-black text-white mb-4">¡Límite superado!</h2>
-        <p id="overbudget-message" class="text-red-100 font-medium mb-10 text-xl leading-tight"></p>
-        <div class="flex flex-col gap-4">
-          <!-- Botón de deshacer en el modal -->
-          <button id="modal-undo" class="w-full py-4 rounded-xl bg-red-500/50 border border-red-400 text-white font-bold text-lg active:scale-95 transition-transform shadow-sm">Deshacer última acción</button>
-          <!-- Botón de reiniciar -->
-          <button id="modal-reset" class="w-full py-4 rounded-xl bg-white text-red-700 font-extrabold text-lg active:scale-95 transition-transform shadow-lg">Reiniciar día</button>
-        </div>
-      </div>
-    </div>
   </main>
 
   <script>
-    try {
-      const STORAGE_KEY = "planner_mobile_v3";
+    const dom = {
+      input: document.getElementById('caloriesInput'),
+      btn: document.getElementById('generateBtn'),
+      nextBtn: document.getElementById('nextBtn'),
+      error: document.getElementById('errorMsg'),
+      loading: document.getElementById('loadingState'),
+      result: document.getElementById('recipeResult'),
+      title: document.getElementById('recipeTitle'),
+      kcal: document.getElementById('recipeKcal'),
+      desc: document.getElementById('recipeDesc'),
+      ingList: document.getElementById('ingredientsList'),
+      instList: document.getElementById('instructionsList')
+    };
+
+    // Función para manejar la visibilidad de las secciones
+    function setUIState(state) {
+      if (state === 'idle') {
+        dom.loading.classList.add('hidden');
+        dom.loading.style.opacity = '0';
+        dom.error.classList.add('hidden');
+        dom.btn.disabled = false;
+        dom.btn.innerHTML = `<span>Generar Receta</span><svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>`;
+      } else if (state === 'loading') {
+        dom.result.classList.add('hidden');
+        dom.result.style.opacity = '0';
+        dom.error.classList.add('hidden');
+        dom.btn.disabled = true;
+        dom.btn.innerHTML = `<span>Cocinando...</span>`;
+        dom.loading.classList.remove('hidden');
+        setTimeout(() => dom.loading.style.opacity = '1', 10);
+      } else if (state === 'success') {
+        dom.loading.classList.add('hidden');
+        dom.loading.style.opacity = '0';
+        dom.btn.disabled = false;
+        dom.btn.innerHTML = `<span>Buscar otra cantidad</span>`;
+        dom.result.classList.remove('hidden');
+        // Pequeño delay para la animación de entrada
+        setTimeout(() => {
+          dom.result.style.opacity = '1';
+          dom.result.style.transform = 'translateY(0)';
+        }, 50);
+      } else if (state === 'error') {
+        dom.loading.classList.add('hidden');
+        dom.loading.style.opacity = '0';
+        dom.btn.disabled = false;
+        dom.btn.innerHTML = `<span>Intentar de nuevo</span>`;
+        dom.error.classList.remove('hidden');
+      }
+    }
+
+    // Llamada a la API de Gemini
+    async function generateRecipe(calories) {
+      setUIState('loading');
       
-      let state = {
-        dailyBudget: 2000,
-        proteinBudget: 150,
-        meals: {
-          breakfast: { calories: "", protein: "", description: "", closed: false },
-          lunch: { calories: "", protein: "", description: "", closed: false },
-          dinner: { calories: "", protein: "", description: "", closed: false }
+      const flavor = document.querySelector('input[name="flavor"]:checked').value;
+      const variant = Math.floor(Math.random() * 10000); // Forzamos a la IA a dar una respuesta distinta
+      
+      const apiKey = ""; // API key se inyecta en runtime
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{
+          role: "user",
+          parts: [{ text: `Crea una receta ${flavor} realista y apetitosa que contenga aproximadamente ${calories} calorías en total. Debe ser MUY FÁCIL y rápida de preparar, requiriendo muy poca elaboración técnica. (ID de variante para forzar creatividad: ${variant}).` }]
+        }],
+        systemInstruction: {
+          parts: [{ text: "Eres un chef experto y nutricionista. Tu objetivo es crear recetas reales, saludables y bien estructuradas que se ajusten a la solicitud calórica del usuario. Especialízate en recetas exprés, súper prácticas y para principiantes (pocos ingredientes, mínimo esfuerzo y sin complicaciones en la cocina). Debes responder EXCLUSIVAMENTE utilizando la estructura JSON solicitada. Las cantidades de los ingredientes deben ser claras (gramos, tazas, cucharadas)." }]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              recipeName: { type: "STRING" },
+              calories: { type: "INTEGER" },
+              description: { type: "STRING" },
+              ingredients: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    item: { type: "STRING" },
+                    quantity: { type: "STRING" }
+                  }
+                }
+              },
+              instructions: {
+                type: "ARRAY",
+                items: { type: "STRING" }
+              }
+            },
+            required: ["recipeName", "calories", "description", "ingredients", "instructions"]
+          }
         }
       };
-
-      let historyStack = [];
 
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) state = JSON.parse(saved);
-      } catch (e) {
-        console.warn("No se pudo cargar", e);
-      }
-
-      function saveState() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-          console.warn("No se pudo guardar", e);
-        }
-      }
-
-      const mealIdeas = [
-        { name: "Tortilla francesa con pan integral", calories: 360, protein: 24, prep: "Huevos, pan integral y tomate." },
-        { name: "Bowl de yogur griego con avena", calories: 420, protein: 32, prep: "Yogur griego, avena, frutos rojos." },
-        { name: "Wrap de pollo y aguacate", calories: 520, protein: 38, prep: "Tortilla, pollo, aguacate, lechuga." },
-        { name: "Ensalada de atún y garbanzos", calories: 480, protein: 34, prep: "Atún, garbanzos, pepino, tomate." },
-        { name: "Pavo con arroz microondas", calories: 510, protein: 42, prep: "Pechuga de pavo, arroz, verduras." },
-        { name: "Huevos revueltos", calories: 390, protein: 31, prep: "Huevos, claras, queso fresco, tostada." },
-        { name: "Sándwich de pollo", calories: 450, protein: 36, prep: "Pan integral, pollo, tomate." },
-        { name: "Merluza con patata", calories: 430, protein: 35, prep: "Merluza, patata cocida, limón." }
-      ];
-
-      const dom = {
-        bCal: document.getElementById('dailyBudget'),
-        bPro: document.getElementById('proteinBudget'),
-        uCal: document.getElementById('caloriesUsed'),
-        lCal: document.getElementById('caloriesLeft'),
-        tPro: document.getElementById('proteinTotal'),
-        lPro: document.getElementById('proteinLeft'),
-        pBar: document.getElementById('progressBar'),
-        pPro: document.getElementById('proteinProgressBar'),
-        txtC: document.getElementById('progressText'),
-        txtP: document.getElementById('proteinProgressText'),
-        txtM: document.getElementById('closedMealsText'),
-        panelS: document.getElementById('suggestionsPanel'),
-        maxC: document.getElementById('maxCalories'),
-        search: document.getElementById('searchIdeas'),
-        grid: document.getElementById('ideasGrid'),
-        modal: document.getElementById('overbudget-modal'),
-        modalMsg: document.getElementById('overbudget-message'),
-        undoBtn: document.getElementById('undoBtn'),
-        modalUndo: document.getElementById('modal-undo'),
-        modalReset: document.getElementById('modal-reset')
-      };
-
-      function pushHistory() {
-        historyStack.push(JSON.parse(JSON.stringify(state)));
-        if (historyStack.length > 20) historyStack.shift();
-        dom.undoBtn.classList.remove('hidden');
-      }
-
-      function performUndo() {
-        if (historyStack.length > 0) {
-          state = historyStack.pop();
-          saveState();
-          updateUI();
-          if (historyStack.length === 0) dom.undoBtn.classList.add('hidden');
-        }
-      }
-
-      dom.undoBtn.addEventListener('click', performUndo);
-      dom.modalUndo.addEventListener('click', performUndo);
-      
-      dom.modalReset.addEventListener('click', () => {
-        pushHistory();
-        state.meals = {
-          breakfast: { calories: "", protein: "", description: "", closed: false },
-          lunch: { calories: "", protein: "", description: "", closed: false },
-          dinner: { calories: "", protein: "", description: "", closed: false }
-        };
-        ['breakfast', 'lunch', 'dinner'].forEach(m => {
-          document.getElementById('cal-' + m).value = "";
-          document.getElementById('pro-' + m).value = "";
-          document.getElementById('desc-' + m).value = "";
-        });
-        saveState();
-        updateUI();
-      });
-
-      function updateUI() {
-        let totals = { cal: 0, pro: 0, closed: 0 };
-        ['breakfast', 'lunch', 'dinner'].forEach(m => {
-          if (state.meals[m].closed) {
-            totals.cal += Number(state.meals[m].calories) || 0;
-            totals.pro += Number(state.meals[m].protein) || 0;
-            totals.closed++;
-          }
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
 
-        const bgCal = Number(state.dailyBudget) || 0;
-        const bgPro = Number(state.proteinBudget) || 0;
-        const leftCal = Math.max(0, bgCal - totals.cal);
+        const result = await response.json();
         
-        dom.uCal.textContent = totals.cal;
-        dom.lCal.textContent = leftCal;
-        dom.tPro.textContent = totals.pro + " g";
-        dom.lPro.textContent = Math.max(0, bgPro - totals.pro) + " g";
-
-        let percCal = bgCal > 0 ? Math.min(100, (totals.cal / bgCal) * 100) : 0;
-        let percPro = bgPro > 0 ? Math.min(100, (totals.pro / bgPro) * 100) : 0;
-        
-        if (totals.cal > bgCal) {
-           dom.pBar.className = "h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500";
-           dom.txtC.classList.replace('text-app-sage', 'text-red-500');
+        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts.length > 0) {
+          const jsonString = result.candidates[0].content.parts[0].text;
+          const recipeData = JSON.parse(jsonString);
+          renderRecipe(recipeData);
         } else {
-           dom.pBar.className = "h-full bg-gradient-to-r from-app-sage to-app-gold transition-all duration-500";
-           dom.txtC.classList.replace('text-red-500', 'text-app-sage');
+          throw new Error("Formato de respuesta inesperado");
         }
-
-        dom.pBar.style.width = percCal + "%";
-        dom.pPro.style.width = percPro + "%";
-        dom.txtC.textContent = Math.round(percCal) + "%";
-        dom.txtP.textContent = Math.round(percPro) + "%";
-        dom.txtM.textContent = totals.closed + " comidas listas";
-
-        const diff = totals.cal - bgCal;
-        if (diff > 0 && totals.closed > 0) {
-          if (diff > 500) {
-             dom.modalMsg.innerHTML = `Has superado tu meta por <span class="font-black text-3xl">${diff}</span> kcal.<br><br>Día de ayuno hasta mañana.<br><span class="bg-red-900/50 px-3 py-2 rounded-xl inline-block mt-4 text-white">Mañana toca hacer OMAD.</span>`;
-          } else {
-             dom.modalMsg.innerHTML = `Has superado tu meta por <span class="font-black text-3xl">${diff}</span> kcal.<br><br>Día de ayuno hasta mañana.`;
-          }
-          dom.modal.classList.remove('hidden');
-          dom.modal.classList.add('flex');
-          document.body.classList.add('overflow-hidden');
-        } else {
-          dom.modal.classList.add('hidden');
-          dom.modal.classList.remove('flex');
-          document.body.classList.remove('overflow-hidden');
-        }
-
-        ['breakfast', 'lunch', 'dinner'].forEach(meal => {
-          const isClosed = state.meals[meal].closed;
-          const card = document.getElementById('card-' + meal);
-          const btn = document.getElementById('btn-' + meal);
-          const lbl = document.getElementById('state-' + meal);
-          const content = document.getElementById('content-' + meal);
-          
-          ['cal', 'pro', 'desc'].forEach(p => document.getElementById(`${p}-${meal}`).disabled = isClosed);
-          
-          if (isClosed) {
-            card.className = "bg-green-50 rounded-2xl p-4 shadow-sm border border-green-200 transition-all duration-300";
-            btn.className = "w-full py-2.5 rounded-xl bg-white text-app-sagedeep border border-green-300 font-bold text-sm active:scale-95 transition-transform mt-0";
-            btn.textContent = "Abrir para editar";
-            lbl.className = "text-xs font-bold px-3 py-1 rounded-full bg-green-200 text-green-800";
-            lbl.textContent = "Completada";
-            content.style.maxHeight = "0px";
-            content.style.opacity = "0";
-            content.style.marginBottom = "0px";
-          } else {
-            card.className = "bg-app-panel rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300";
-            btn.className = "w-full py-3 rounded-xl bg-app-sagedeep text-white font-bold text-sm active:scale-95 transition-transform mt-2";
-            btn.textContent = "Cerrar comida";
-            lbl.className = "text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-500";
-            lbl.textContent = "Abierta";
-            content.style.maxHeight = "300px";
-            content.style.opacity = "1";
-            content.style.marginBottom = "12px";
-          }
-        });
-
-        if (totals.closed >= 2 && totals.cal <= bgCal) {
-          dom.panelS.classList.remove('hidden');
-          if (document.activeElement !== dom.maxC) dom.maxC.value = leftCal;
-          renderIdeas(leftCal);
-        } else {
-          dom.panelS.classList.add('hidden');
-        }
+      } catch (error) {
+        console.error("Error al generar la receta:", error);
+        dom.error.textContent = "Hubo un problema al contactar al chef. Por favor, intenta de nuevo.";
+        setUIState('error');
       }
-
-      function renderIdeas(targetCal) {
-        const query = dom.search.value.toLowerCase().trim();
-        const max = Number(dom.maxC.value) || targetCal;
-        
-        let filtered = mealIdeas.filter(i => i.calories <= (max + 100) && (!query || i.name.toLowerCase().includes(query) || i.prep.toLowerCase().includes(query)));
-        filtered.sort((a, b) => Math.abs(a.calories - max) - Math.abs(b.calories - max));
-        
-        if (filtered.length === 0) {
-          dom.grid.innerHTML = '<div class="bg-white/10 p-4 rounded-xl text-sm text-center text-green-100">No hay ideas para esa búsqueda.</div>';
-          return;
-        }
-
-        dom.grid.innerHTML = filtered.slice(0, 5).map(idea => `
-          <div class="bg-white/10 border border-white/10 rounded-xl p-4">
-            <div class="flex justify-between items-start mb-2">
-              <h3 class="font-bold text-sm text-white pr-2">${idea.name}</h3>
-              <div class="flex flex-col items-end shrink-0">
-                <span class="text-xs font-extrabold text-app-gold">${idea.calories} kcal</span>
-                <span class="text-xs font-bold text-blue-200">${idea.protein}g prot</span>
-              </div>
-            </div>
-            <p class="text-xs text-green-100 opacity-90 leading-relaxed">${idea.prep}</p>
-          </div>
-        `).join('');
-      }
-
-      dom.bCal.value = state.dailyBudget;
-      dom.bPro.value = state.proteinBudget;
-      dom.bCal.addEventListener('input', e => { state.dailyBudget = e.target.value; saveState(); updateUI(); });
-      dom.bPro.addEventListener('input', e => { state.proteinBudget = e.target.value; saveState(); updateUI(); });
-      dom.search.addEventListener('input', () => updateUI());
-      dom.maxC.addEventListener('input', () => updateUI());
-
-      ['breakfast', 'lunch', 'dinner'].forEach(meal => {
-        ['cal', 'pro', 'desc'].forEach(p => {
-          const el = document.getElementById(`${p}-${meal}`);
-          el.value = state.meals[meal][p === 'cal' ? 'calories' : p === 'pro' ? 'protein' : 'description'] || "";
-          el.addEventListener('input', e => {
-            if (p === 'cal') state.meals[meal].calories = e.target.value;
-            if (p === 'pro') state.meals[meal].protein = e.target.value;
-            if (p === 'desc') state.meals[meal].description = e.target.value;
-            saveState();
-            updateUI();
-          });
-        });
-
-        document.getElementById('btn-' + meal).addEventListener('click', (e) => {
-          const m = state.meals[meal];
-          const btn = e.target;
-          
-          if (m.closed) {
-            pushHistory();
-            m.closed = false;
-          } else {
-            if (Number(m.calories) > 0 && Number(m.protein) > 0) {
-              pushHistory();
-              m.closed = true;
-            } else {
-              const originalText = btn.textContent;
-              btn.textContent = "Faltan datos (Kcal / Prot)";
-              btn.classList.add('bg-app-tomato');
-              btn.classList.remove('bg-app-sagedeep');
-              setTimeout(() => {
-                btn.textContent = originalText;
-                btn.classList.remove('bg-app-tomato');
-                btn.classList.add('bg-app-sagedeep');
-              }, 2000);
-              return;
-            }
-          }
-          saveState();
-          updateUI();
-        });
-      });
-
-      let resetClicks = 0;
-      const resetBtn = document.getElementById('resetDay');
-      resetBtn.addEventListener('click', () => {
-        if (resetClicks === 0) {
-          resetClicks++;
-          resetBtn.textContent = "¿Seguro? Toca de nuevo";
-          resetBtn.className = "text-white text-sm font-bold px-4 py-2 rounded-lg bg-app-tomato transition-colors";
-          setTimeout(() => {
-            resetClicks = 0;
-            resetBtn.textContent = "Limpiar día";
-            resetBtn.className = "text-app-tomato text-sm font-bold px-4 py-2 rounded-lg border border-app-tomato/30 bg-red-50 transition-colors";
-          }, 3000);
-        } else {
-          pushHistory();
-          state.meals = {
-            breakfast: { calories: "", protein: "", description: "", closed: false },
-            lunch: { calories: "", protein: "", description: "", closed: false },
-            dinner: { calories: "", protein: "", description: "", closed: false }
-          };
-          ['breakfast', 'lunch', 'dinner'].forEach(m => {
-            document.getElementById('cal-' + m).value = "";
-            document.getElementById('pro-' + m).value = "";
-            document.getElementById('desc-' + m).value = "";
-          });
-          saveState();
-          updateUI();
-          resetClicks = 0;
-          resetBtn.textContent = "Limpiar día";
-          resetBtn.className = "text-app-tomato text-sm font-bold px-4 py-2 rounded-lg border border-app-tomato/30 bg-red-50 transition-colors";
-        }
-      });
-
-      updateUI();
-      
-    } catch (e) {
-      document.body.innerHTML = `<div class="p-10 text-center font-bold text-red-600">Error: ${e.message}</div>`;
     }
+
+    // Renderizar los datos en el HTML
+    function renderRecipe(data) {
+      dom.title.textContent = data.recipeName;
+      dom.kcal.textContent = data.calories;
+      dom.desc.textContent = `"${data.description}"`;
+      
+      // Limpiar listas
+      dom.ingList.innerHTML = '';
+      dom.instList.innerHTML = '';
+
+      // Render ingredientes
+      data.ingredients.forEach(ing => {
+        const li = document.createElement('li');
+        li.className = "flex justify-between items-center bg-slate-50 py-2 px-3 rounded-lg border border-slate-100 text-sm";
+        li.innerHTML = `
+          <span class="font-semibold text-slate-700">${ing.item}</span>
+          <span class="font-bold text-app-sage text-right shrink-0 ml-4">${ing.quantity}</span>
+        `;
+        dom.ingList.appendChild(li);
+      });
+
+      // Render instrucciones
+      data.instructions.forEach((step, index) => {
+        const li = document.createElement('li');
+        li.className = "flex gap-3 text-sm text-slate-600 leading-relaxed";
+        li.innerHTML = `
+          <span class="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-app-sagedeep font-black text-xs shrink-0 mt-0.5">${index + 1}</span>
+          <span>${step}</span>
+        `;
+        dom.instList.appendChild(li);
+      });
+
+      setUIState('success');
+    }
+
+    // Eventos
+    dom.btn.addEventListener('click', () => {
+      const cals = parseInt(dom.input.value, 10);
+      
+      // Validación básica
+      if (isNaN(cals) || cals < 50 || cals > 5000) {
+        dom.error.textContent = "Ingresa un valor válido (entre 50 y 5000 kcal).";
+        dom.error.classList.remove('hidden');
+        dom.result.classList.add('hidden');
+        return;
+      }
+      
+      dom.error.classList.add('hidden');
+      generateRecipe(cals);
+    });
+    
+    // Evento para el botón de "Siguiente"
+    dom.nextBtn.addEventListener('click', () => {
+      const cals = parseInt(dom.input.value, 10);
+      generateRecipe(cals);
+    });
+    
+    // Permitir generar con la tecla Enter
+    dom.input.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        dom.btn.click();
+      }
+    });
+
   </script>
 </body>
 </html>
